@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Futuristic Flyer Builder</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@300;500&family=Montserrat:wght@400;700&family=Bebas+Neue&family=Raleway:wght@400;700&family=Rubik:wght@400;700&family=Exo+2:wght@400;700&family=Oswald:wght@400;700&family=Fjalla+One&family=Russo+One&family=Teko:wght@400;700&family=Press+Start+2P&family=Audiowide&family=Share+Tech+Mono&family=VT323&family=Tomorrow:wght@400;700&family=Syne:wght@400;700&family=Major+Mono+Display&family=Zilla+Slab:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
@@ -43,7 +44,7 @@
       font-weight: 500;
       color: #aaa;
     }
-    .controls input, .controls textarea, .controls button {
+    .controls input, .controls textarea, .controls select, .controls button {
       width: 100%;
       margin-bottom: 15px;
       padding: 10px;
@@ -61,6 +62,20 @@
     }
     .controls button:hover {
       opacity: 0.8;
+    }
+    .color-palette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+    .color-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
     }
     .preview {
       background: #0f0f1a;
@@ -81,7 +96,6 @@
       padding: 60px 40px;
       overflow: hidden;
     }
-    /* Futuristic accents */
     .flyer-preview::before {
       content: '';
       position: absolute;
@@ -153,7 +167,7 @@
 </head>
 <body>
   <header>
-    <h1>🚀 Neon Flyer Builder by Titan Business Pros LLC</h1>
+    <h1>🚀 Futuristic Flyer Builder</h1>
   </header>
 
   <div class="container">
@@ -164,6 +178,42 @@
       <input type="text" id="title-text" value="Where the Future Meets the Beat">
       <h2>Content</h2>
       <textarea id="content-text" rows="6">Experience music, lights, and energy like never before. Saturday, Downtown Arena. Be there.</textarea>
+
+      <h2>Font</h2>
+      <select id="font-select">
+        <option value="Orbitron">Orbitron</option>
+        <option value="Roboto">Roboto</option>
+        <option value="Montserrat">Montserrat</option>
+        <option value="Bebas Neue">Bebas Neue</option>
+        <option value="Raleway">Raleway</option>
+        <option value="Rubik">Rubik</option>
+        <option value="Exo 2">Exo 2</option>
+        <option value="Oswald">Oswald</option>
+        <option value="Fjalla One">Fjalla One</option>
+        <option value="Russo One">Russo One</option>
+        <option value="Teko">Teko</option>
+        <option value="Press Start 2P">Press Start 2P</option>
+        <option value="Audiowide">Audiowide</option>
+        <option value="Share Tech Mono">Share Tech Mono</option>
+        <option value="VT323">VT323</option>
+        <option value="Tomorrow">Tomorrow</option>
+        <option value="Syne">Syne</option>
+        <option value="Major Mono Display">Major Mono Display</option>
+        <option value="Zilla Slab">Zilla Slab</option>
+      </select>
+
+      <h2>Neon Colors</h2>
+      <div class="color-palette" id="color-palette">
+        <div class="color-swatch" style="background:#00d4ff"></div>
+        <div class="color-swatch" style="background:#ff00ff"></div>
+        <div class="color-swatch" style="background:#39ff14"></div>
+        <div class="color-swatch" style="background:#ffea00"></div>
+        <div class="color-swatch" style="background:#ff073a"></div>
+        <div class="color-swatch" style="background:#ff6600"></div>
+        <div class="color-swatch" style="background:#8a2be2"></div>
+        <div class="color-swatch" style="background:#00ffcc"></div>
+      </div>
+
       <h2>Image</h2>
       <input type="file" id="image-upload" accept="image/*">
       <button id="remove-image">Remove Image</button>
@@ -191,16 +241,32 @@
     const headerEl = document.getElementById('preview-header');
     const titleEl = document.getElementById('preview-title');
     const contentEl = document.getElementById('preview-content');
+    const fontSelect = document.getElementById('font-select');
 
     // Live typing
-    headerInput.addEventListener('input', () => {
-      headerEl.textContent = headerInput.value;
+    headerInput.addEventListener('input', () => { headerEl.textContent = headerInput.value; });
+    titleInput.addEventListener('input', () => { titleEl.textContent = titleInput.value; });
+    contentInput.addEventListener('input', () => { contentEl.textContent = contentInput.value; });
+
+    // Font change
+    fontSelect.addEventListener('change', () => {
+      const font = fontSelect.value;
+      headerEl.style.fontFamily = font;
+      titleEl.style.fontFamily = font;
+      contentEl.style.fontFamily = font;
     });
-    titleInput.addEventListener('input', () => {
-      titleEl.textContent = titleInput.value;
-    });
-    contentInput.addEventListener('input', () => {
-      contentEl.textContent = contentInput.value;
+
+    // Neon color change
+    document.querySelectorAll('.color-swatch').forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        const color = swatch.style.background;
+        headerEl.style.color = color;
+        titleEl.style.color = color;
+        contentEl.style.color = color;
+        headerEl.style.textShadow = `0 0 12px ${color}`;
+        titleEl.style.textShadow = `0 0 12px ${color}`;
+        contentEl.style.textShadow = `0 0 8px ${color}`;
+      });
     });
 
     // Image upload
@@ -214,7 +280,6 @@
       };
       reader.readAsDataURL(file);
     });
-
     document.getElementById('remove-image').addEventListener('click', function() {
       document.getElementById('preview-image').src = '';
       document.getElementById('image-wrapper').style.display = 'none';
@@ -247,7 +312,6 @@
         link.click();
       });
     });
-
     document.getElementById('download-pdf').addEventListener('click', () => {
       html2canvas(document.getElementById('flyer-preview')).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
