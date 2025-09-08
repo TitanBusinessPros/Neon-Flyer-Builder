@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Futuristic Flyer Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      background: radial-gradient(circle at top, #1a1a2e, #0f0f1a);
+      padding: 20px;
+      font-family: 'Roboto', sans-serif;
+      color: #fff;
+    }
+    header {
+      text-align: center;
+      background: linear-gradient(135deg, #6a00f4, #00d4ff);
+      color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-family: 'Orbitron', sans-serif;
+      box-shadow: 0 0 20px rgba(0, 200, 255, 0.4);
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .controls {
+      background: #151520;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    }
+    .controls h2 {
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #aaa;
+    }
+    .controls input, .controls textarea, .controls button {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: #222233;
+      color: #fff;
+    }
+    .controls button {
+      background: linear-gradient(90deg, #6a00f4, #00d4ff);
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .controls button:hover {
+      opacity: 0.8;
+    }
+    .preview {
+      background: #0f0f1a;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: inset 0 0 20px rgba(0,255,255,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .flyer-preview {
+      position: relative;
+      width: 8.5in;
+      min-height: 11in;
+      background: linear-gradient(160deg, #1a1a2e, #12122b);
+      border-radius: 15px;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+      padding: 60px 40px;
+      overflow: hidden;
+    }
+    /* Futuristic accents */
+    .flyer-preview::before {
+      content: '';
+      position: absolute;
+      top: -100px; left: -100px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(0,255,255,0.4), transparent);
+      filter: blur(120px);
+      z-index: 0;
+    }
+    .flyer-preview::after {
+      content: '';
+      position: absolute;
+      bottom: -100px; right: -100px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255,0,200,0.4), transparent);
+      filter: blur(120px);
+      z-index: 0;
+    }
+    .flyer-header {
+      font-size: 3rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 25px;
+      font-family: 'Orbitron', sans-serif;
+      color: #00d4ff;
+      text-shadow: 0 0 12px rgba(0,212,255,0.6);
+      position: relative;
+      z-index: 1;
+    }
+    .flyer-title {
+      font-size: 1.8rem;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #eee;
+      position: relative;
+      z-index: 1;
+    }
+    .flyer-content {
+      font-size: 1.1rem;
+      text-align: center;
+      line-height: 1.6;
+      color: #ccc;
+      white-space: pre-line;
+      position: relative;
+      z-index: 1;
+    }
+    .resizable-draggable {
+      position: absolute;
+      top: 180px;
+      left: 100px;
+      width: 300px;
+      height: auto;
+      resize: both;
+      overflow: hidden;
+      cursor: move;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,255,255,0.5);
+      z-index: 2;
+    }
+    .resizable-draggable img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚀 Neon Flyer Builder by Titan Business Pros LLC</h1>
+  </header>
+
+  <div class="container">
+    <div class="controls">
+      <h2>Header</h2>
+      <input type="text" id="header-text" value="NEON NIGHT FESTIVAL">
+      <h2>Title</h2>
+      <input type="text" id="title-text" value="Where the Future Meets the Beat">
+      <h2>Content</h2>
+      <textarea id="content-text" rows="6">Experience music, lights, and energy like never before. Saturday, Downtown Arena. Be there.</textarea>
+      <h2>Image</h2>
+      <input type="file" id="image-upload" accept="image/*">
+      <button id="remove-image">Remove Image</button>
+      <button id="download-png">Download PNG</button>
+      <button id="download-pdf">Download PDF</button>
+    </div>
+
+    <div class="preview">
+      <h2>Flyer Preview</h2>
+      <div class="flyer-preview" id="flyer-preview">
+        <h1 class="flyer-header" id="preview-header">NEON NIGHT FESTIVAL</h1>
+        <h2 class="flyer-title" id="preview-title">Where the Future Meets the Beat</h2>
+        <p class="flyer-content" id="preview-content">Experience music, lights, and energy like never before. Saturday, Downtown Arena. Be there.</p>
+        <div id="image-wrapper" class="resizable-draggable" style="display:none;">
+          <img id="preview-image" src="">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const headerInput = document.getElementById('header-text');
+    const titleInput = document.getElementById('title-text');
+    const contentInput = document.getElementById('content-text');
+    const headerEl = document.getElementById('preview-header');
+    const titleEl = document.getElementById('preview-title');
+    const contentEl = document.getElementById('preview-content');
+
+    // Live typing
+    headerInput.addEventListener('input', () => {
+      headerEl.textContent = headerInput.value;
+    });
+    titleInput.addEventListener('input', () => {
+      titleEl.textContent = titleInput.value;
+    });
+    contentInput.addEventListener('input', () => {
+      contentEl.textContent = contentInput.value;
+    });
+
+    // Image upload
+    document.getElementById('image-upload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        document.getElementById('preview-image').src = evt.target.result;
+        document.getElementById('image-wrapper').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('remove-image').addEventListener('click', function() {
+      document.getElementById('preview-image').src = '';
+      document.getElementById('image-wrapper').style.display = 'none';
+    });
+
+    // Drag image
+    const wrapper = document.getElementById('image-wrapper');
+    let isDragging = false, offsetX, offsetY;
+    wrapper.addEventListener('mousedown', (e) => {
+      if (e.target.tagName === 'IMG') return;
+      isDragging = true;
+      offsetX = e.offsetX;
+      offsetY = e.offsetY;
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const flyer = document.getElementById('flyer-preview');
+      const rect = flyer.getBoundingClientRect();
+      wrapper.style.left = (e.clientX - rect.left - offsetX) + 'px';
+      wrapper.style.top = (e.clientY - rect.top - offsetY) + 'px';
+    });
+    document.addEventListener('mouseup', () => isDragging = false);
+
+    // Export
+    document.getElementById('download-png').addEventListener('click', () => {
+      html2canvas(document.getElementById('flyer-preview')).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'flyer.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    });
+
+    document.getElementById('download-pdf').addEventListener('click', () => {
+      html2canvas(document.getElementById('flyer-preview')).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p','mm','a4');
+        const width = pdf.internal.pageSize.getWidth();
+        const height = canvas.height * width / canvas.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+        pdf.save('flyer.pdf');
+      });
+    });
+  </script>
+</body>
+</html>
