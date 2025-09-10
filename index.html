@@ -1,409 +1,669 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futuristic Flyer Builder</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Futuristic Flyer Builder — Upgraded</title>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@300;500&family=Montserrat:wght@400;700&family=Bebas+Neue&family=Raleway:wght@400;700&family=Rubik:wght@400;700&family=Exo+2:wght@400;700&family=Oswald:wght@400;700&family=Fjalla+One&family=Russo+One&family=Teko:wght@400;700&family=Press+Start+2P&family=Audiowide&family=Share+Tech+Mono&family=VT323&family=Tomorrow:wght@400;700&family=Syne:wght@400;700&family=Major+Mono+Display&family=Zilla+Slab:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Font Awesome for Icons -->
+  <!-- Font Awesome icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-  <!-- Libraries -->
+  <!-- html2canvas & jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
-    body {
-      background: radial-gradient(circle at top, #1a1a2e, #0f0f1a);
-      padding: 20px;
-      font-family: 'Roboto', sans-serif;
-      color: #fff;
+    :root{
+      --panel-bg:#151520;
+      --control-bg:#222233;
+      --accent1:linear-gradient(90deg,#6a00f4,#00d4ff);
+      --neon-border:rgba(0,255,255,0.07);
     }
-    header {
-      text-align: center;
-      background: linear-gradient(135deg, #6a00f4, #00d4ff);
-      color: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      font-family: 'Orbitron', sans-serif;
-      box-shadow: 0 0 20px rgba(0, 200, 255, 0.4);
+
+    html,body{height:100%;margin:0}
+    body{
+      background: radial-gradient(circle at top,#0f1224,#06060d);
+      font-family:'Roboto',sans-serif;
+      color:#fff;
+      padding:18px;
     }
-    .container {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 20px;
-      max-width: 1400px;
-      margin: auto;
+
+    header{
+      text-align:center;
+      background:linear-gradient(135deg,#6a00f4,#00d4ff);
+      padding:18px;border-radius:12px;margin-bottom:16px;
+      box-shadow:0 8px 30px rgba(0,200,255,0.12);
+      font-family:'Orbitron',sans-serif;
     }
-    .controls {
-      background: #151520;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.6);
-      max-height: 90vh;
-      overflow-y: auto;
+    header h1{margin:6px 0;font-size:1.4rem}
+    header p{margin:0;color:rgba(255,255,255,0.9);font-size:0.95rem}
+
+    .wrap{
+      display:grid;
+      grid-template-columns:340px 1fr;
+      gap:18px;
+      max-width:1400px;margin:0 auto;
     }
-    .controls h2 {
-      font-size: 0.9rem;
-      margin-bottom: 5px;
-      font-weight: 500;
-      color: #aaa;
+
+    /* Controls */
+    .controls{
+      background:var(--panel-bg);
+      padding:16px;border-radius:12px;
+      box-shadow:0 8px 30px rgba(0,0,0,0.6);
+      max-height:88vh;overflow:auto;
     }
-    .controls input, .controls textarea, .controls select, .controls button {
-      width: 100%;
-      margin-bottom: 15px;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      background: #222233;
-      color: #fff;
+    .controls h3{margin:10px 0 6px;color:#bfc7d6;font-size:0.95rem}
+    .controls input[type="text"],
+    .controls textarea,
+    .controls select,
+    .controls input[type="file"]{
+      width:100%;padding:10px;border-radius:8px;border:none;background:var(--control-bg);color:#fff;margin-bottom:10px;font-size:0.95rem;
     }
-    .controls input[type=range] {
-      padding: 0;
-      cursor: pointer;
+    .controls textarea{min-height:90px;resize:vertical}
+
+    .controls label{display:block;color:#9aa3b8;font-size:0.85rem;margin-bottom:6px}
+
+    .controls .row{display:flex;gap:8px}
+    .controls button{
+      width:100%;padding:10px;border-radius:8px;border:none;background:var(--accent1);color:#fff;font-weight:600;cursor:pointer;margin-top:8px;
     }
-    .controls button {
-      background: linear-gradient(90deg, #6a00f4, #00d4ff);
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
+    .controls input[type=range]{width:100%}
+
+    .color-palette{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+    .color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,0.12);box-shadow:0 0 8px rgba(255,255,255,0.04)}
+
+    /* Icon Library */
+    .icon-library{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+    .icon-library i{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;font-size:18px;color:#8ef0ff;text-shadow:0 0 10px rgba(0,212,255,0.35)}
+    .icon-library i:hover{transform:scale(1.12);background:rgba(255,255,255,0.02)}
+
+    /* Selected object controls */
+    #selected-controls{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;margin-top:10px}
+    #selected-controls .muted{font-size:0.85rem;color:#9aa3b8;margin-bottom:8px}
+
+    /* Preview */
+    .preview{background:transparent;padding:6px;border-radius:12px}
+    .flyer-preview{
+      width:8.5in;height:11in; /* explicit sizes so PDF matches 8.5x11 */
+      border-radius:12px;margin:0 auto;position:relative;
+      background:linear-gradient(160deg,#0f1224,#12122b);
+      padding:56px 48px;box-shadow:0 20px 60px rgba(0,200,255,0.06), inset 0 0 80px rgba(255,255,255,0.01);
+      box-sizing:border-box;overflow:hidden;
     }
-    .controls button:hover {
-      opacity: 0.8;
+
+    /* accent glows */
+    .flyer-preview::before{
+      content:"";position:absolute;left:-140px;top:-120px;width:360px;height:360px;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,212,255,0.25),transparent);filter:blur(80px);z-index:0;
     }
-    .color-palette {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 15px;
+    .flyer-preview::after{
+      content:"";position:absolute;right:-140px;bottom:-120px;width:360px;height:360px;border-radius:50%;
+      background:radial-gradient(circle,rgba(255,0,200,0.2),transparent);filter:blur(80px);z-index:0;
     }
-    .color-swatch {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid #fff;
-      box-shadow: 0 0 10px rgba(255,255,255,0.5);
-    }
-    .preview {
-      background: #0f0f1a;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: inset 0 0 20px rgba(0,255,255,0.15);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .flyer-preview {
-      position: relative;
-      width: 8.5in;
-      min-height: 11in;
-      background: linear-gradient(160deg, #1a1a2e, #12122b);
-      border-radius: 15px;
-      box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
-      padding: 60px 40px;
-      overflow: hidden;
-      box-sizing: border-box;
-    }
+
     .flyer-header,
     .flyer-title,
-    .flyer-content {
-      max-width: 90%;
-      margin: auto;
-      word-wrap: break-word;
-      overflow-wrap: anywhere;
-      text-align: center;
-      box-sizing: border-box;
+    .flyer-content{
+      position:relative;z-index:2;margin:0 auto;text-align:center;
+      max-width:86%;word-wrap:break-word;overflow-wrap:anywhere;
     }
-    .flyer-header {
-      font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 25px;
-      font-family: 'Orbitron', sans-serif;
-      color: #00d4ff;
-      text-shadow: 0 0 12px rgba(0,212,255,0.6);
+
+    .flyer-header{font-family:'Orbitron',sans-serif;font-weight:700;font-size:48px;color:#00d4ff;margin-bottom:14px;text-shadow:0 0 12px rgba(0,212,255,0.6)}
+    .flyer-title{font-weight:600;font-size:26px;color:#eee;margin-bottom:14px}
+    .flyer-content{font-size:18px;color:#ddd;line-height:1.55;white-space:pre-wrap}
+
+    /* Draggable inserted image */
+    .resizable-draggable{
+      position:absolute;left:100px;top:160px;width:300px;height:auto;resize:both;overflow:hidden;border-radius:12px;z-index:10;cursor:move;
+      box-shadow:0 10px 30px rgba(0,0,0,0.5);
     }
-    .flyer-title {
-      font-size: 1.8rem;
-      font-weight: 500;
-      margin-bottom: 20px;
-      color: #eee;
-    }
-    .flyer-content {
-      font-size: 1.1rem;
-      line-height: 1.6;
-      color: #ccc;
-      white-space: pre-wrap;
-    }
-    .resizable-draggable {
-      position: absolute;
-      top: 180px;
-      left: 100px;
-      width: 300px;
-      height: auto;
-      resize: both;
-      overflow: hidden;
-      cursor: move;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,255,255,0.5);
-      z-index: 2;
-    }
-    .resizable-draggable img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      pointer-events: none;
-      display: block;
-    }
-    .icon-library {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-    .icon-library i {
-      font-size: 24px;
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 6px;
-      transition: transform 0.2s;
-      text-shadow: 0 0 10px cyan, 0 0 20px cyan;
-    }
-    .icon-library i:hover {
-      transform: scale(1.2);
-      background: rgba(0,255,255,0.1);
-    }
-    .flyer-icon {
-      position: absolute;
-      font-size: 40px;
-      color: cyan;
-      text-shadow: 0 0 12px cyan, 0 0 24px cyan;
-      cursor: move;
-    }
+    .resizable-draggable img{width:100%;height:100%;object-fit:contain;pointer-events:none;display:block}
+
+    /* icons on flyer */
+    .flyer-icon{position:absolute;left:60px;top:60px;font-size:40px;color:#00d4ff;text-shadow:0 0 12px rgba(0,212,255,0.7);z-index:8;cursor:move}
+
+    /* small helpers */
+    .muted{color:#9aa3b8;font-size:0.85rem}
+    .sp{height:10px}
+    @media (max-width:980px){ .wrap{grid-template-columns:1fr; padding-bottom:30px} .controls{max-height:none} .flyer-preview{width:100%;height:auto;min-height:650px} }
   </style>
 </head>
 <body>
   <header>
-    <h1>🚀 Futuristic Flyer Builder</h1>
+    <h1>🚀 Futuristic Flyer Builder — Upgraded</h1>
+    <p>All features included: fonts, neon colors, glows, icons, images, and exports (PNG / PDF / HTML)</p>
   </header>
 
-  <div class="container">
+  <div class="wrap">
     <div class="controls">
-      <h2>Header</h2>
-      <input type="text" id="header-text" value="NEON NIGHT FESTIVAL">
-      <label>Font Size</label>
-      <input type="range" id="header-size" min="20" max="100" value="48">
+      <!-- Header controls -->
+      <h3>Header</h3>
+      <input id="header-text" type="text" value="NEON NIGHT FESTIVAL" />
+      <label>Font size</label>
+      <input id="header-size" type="range" min="20" max="120" value="48" />
+      <label>Glow intensity</label>
+      <input id="header-glow" type="range" min="0" max="60" value="12" />
+      <label>Color (neon palette)</label>
+      <div class="color-palette" data-target="header" id="palette-header"></div>
 
-      <h2>Title</h2>
-      <input type="text" id="title-text" value="Where the Future Meets the Beat">
-      <label>Font Size</label>
-      <input type="range" id="title-size" min="16" max="60" value="28">
+      <!-- Title controls -->
+      <h3>Title</h3>
+      <input id="title-text" type="text" value="Where the Future Meets the Beat" />
+      <label>Font size</label>
+      <input id="title-size" type="range" min="14" max="72" value="26" />
+      <label>Glow intensity</label>
+      <input id="title-glow" type="range" min="0" max="60" value="10" />
+      <label>Color (neon palette)</label>
+      <div class="color-palette" data-target="title" id="palette-title"></div>
 
-      <h2>Content</h2>
-      <textarea id="content-text" rows="6">Experience music, lights, and energy like never before. Saturday, Downtown Arena. Be there.</textarea>
-      <label>Font Size</label>
-      <input type="range" id="content-size" min="12" max="40" value="18">
+      <!-- Content controls -->
+      <h3>Content</h3>
+      <textarea id="content-text">Experience music, lights, and energy like never before. Saturday, Downtown Arena. Be there.</textarea>
+      <label>Font size</label>
+      <input id="content-size" type="range" min="10" max="36" value="18" />
+      <label>Glow intensity</label>
+      <input id="content-glow" type="range" min="0" max="60" value="8" />
+      <label>Color (neon palette)</label>
+      <div class="color-palette" data-target="content" id="palette-content"></div>
 
-      <h2>Font</h2>
+      <!-- font selector -->
+      <h3>Font</h3>
       <select id="font-select">
-        <option value="Orbitron">Orbitron</option>
-        <option value="Roboto">Roboto</option>
-        <option value="Montserrat">Montserrat</option>
-        <option value="Bebas Neue">Bebas Neue</option>
-        <option value="Raleway">Raleway</option>
-        <option value="Rubik">Rubik</option>
-        <option value="Exo 2">Exo 2</option>
-        <option value="Oswald">Oswald</option>
-        <option value="Fjalla One">Fjalla One</option>
-        <option value="Russo One">Russo One</option>
-        <option value="Teko">Teko</option>
-        <option value="Press Start 2P">Press Start 2P</option>
-        <option value="Audiowide">Audiowide</option>
-        <option value="Share Tech Mono">Share Tech Mono</option>
-        <option value="VT323">VT323</option>
-        <option value="Tomorrow">Tomorrow</option>
-        <option value="Syne">Syne</option>
-        <option value="Major Mono Display">Major Mono Display</option>
-        <option value="Zilla Slab">Zilla Slab</option>
+        <option>Orbitron</option><option>Roboto</option><option>Montserrat</option><option>Bebas Neue</option>
+        <option>Raleway</option><option>Rubik</option><option>Exo 2</option><option>Oswald</option>
+        <option>Fjalla One</option><option>Russo One</option><option>Teko</option><option>Press Start 2P</option>
+        <option>Audiowide</option><option>Share Tech Mono</option><option>VT323</option><option>Tomorrow</option>
+        <option>Syne</option><option>Major Mono Display</option><option>Zilla Slab</option>
       </select>
 
-      <h2>Header Color</h2>
-      <div class="color-palette" data-target="header"></div>
-      <h2>Title Color</h2>
-      <div class="color-palette" data-target="title"></div>
-      <h2>Content Color</h2>
-      <div class="color-palette" data-target="content"></div>
-
-      <h2>Icons</h2>
+      <!-- Icon library -->
+      <h3>Icon Library (click to add)</h3>
       <div class="icon-library" id="icon-library">
-        <!-- 50 icons -->
-        <i class="fas fa-star"></i><i class="fas fa-heart"></i><i class="fas fa-music"></i>
-        <i class="fas fa-bolt"></i><i class="fas fa-cloud"></i><i class="fas fa-moon"></i>
-        <i class="fas fa-sun"></i><i class="fas fa-fire"></i><i class="fas fa-gem"></i>
-        <i class="fas fa-crown"></i><i class="fas fa-robot"></i><i class="fas fa-rocket"></i>
-        <i class="fas fa-car"></i><i class="fas fa-bicycle"></i><i class="fas fa-plane"></i>
-        <i class="fas fa-tree"></i><i class="fas fa-leaf"></i><i class="fas fa-snowflake"></i>
-        <i class="fas fa-wine-glass"></i><i class="fas fa-beer"></i><i class="fas fa-cocktail"></i>
-        <i class="fas fa-pizza-slice"></i><i class="fas fa-hamburger"></i><i class="fas fa-ice-cream"></i>
-        <i class="fas fa-guitar"></i><i class="fas fa-drum"></i><i class="fas fa-headphones"></i>
-        <i class="fas fa-microphone"></i><i class="fas fa-dice"></i><i class="fas fa-chess"></i>
-        <i class="fas fa-bomb"></i><i class="fas fa-skull"></i><i class="fas fa-ghost"></i>
-        <i class="fas fa-dragon"></i><i class="fas fa-cat"></i><i class="fas fa-dog"></i>
-        <i class="fas fa-hat-wizard"></i><i class="fas fa-eye"></i><i class="fas fa-feather"></i>
-        <i class="fas fa-anchor"></i><i class="fas fa-ship"></i><i class="fas fa-water"></i>
-        <i class="fas fa-fish"></i><i class="fas fa-frog"></i><i class="fas fa-bug"></i>
-        <i class="fas fa-spider"></i><i class="fas fa-dragon"></i><i class="fas fa-gamepad"></i>
+        <!-- 50 icons (a wide variety) -->
+        <i class="fas fa-star"></i><i class="fas fa-heart"></i><i class="fas fa-music"></i><i class="fas fa-bolt"></i>
+        <i class="fas fa-cloud"></i><i class="fas fa-moon"></i><i class="fas fa-sun"></i><i class="fas fa-fire"></i>
+        <i class="fas fa-gem"></i><i class="fas fa-crown"></i><i class="fas fa-robot"></i><i class="fas fa-rocket"></i>
+        <i class="fas fa-car"></i><i class="fas fa-bicycle"></i><i class="fas fa-plane"></i><i class="fas fa-tree"></i>
+        <i class="fas fa-leaf"></i><i class="fas fa-snowflake"></i><i class="fas fa-wine-glass"></i><i class="fas fa-beer"></i>
+        <i class="fas fa-cocktail"></i><i class="fas fa-pizza-slice"></i><i class="fas fa-hamburger"></i><i class="fas fa-ice-cream"></i>
+        <i class="fas fa-guitar"></i><i class="fas fa-drum"></i><i class="fas fa-headphones"></i><i class="fas fa-microphone"></i>
+        <i class="fas fa-dice"></i><i class="fas fa-chess"></i><i class="fas fa-bomb"></i><i class="fas fa-skull"></i>
+        <i class="fas fa-ghost"></i><i class="fas fa-dragon"></i><i class="fas fa-cat"></i><i class="fas fa-dog"></i>
+        <i class="fas fa-hat-wizard"></i><i class="fas fa-eye"></i><i class="fas fa-feather"></i><i class="fas fa-anchor"></i>
+        <i class="fas fa-ship"></i><i class="fas fa-water"></i><i class="fas fa-fish"></i><i class="fas fa-frog"></i>
+        <i class="fas fa-bug"></i><i class="fas fa-spider"></i><i class="fas fa-gamepad"></i><i class="fas fa-wallet"></i>
+        <i class="fas fa-ticket-alt"></i><i class="fas fa-clock"></i>
       </div>
 
-      <h2>Image</h2>
-      <input type="file" id="image-upload" accept="image/*">
-      <button id="remove-image">Remove Image</button>
-      <button id="download-png">Download PNG</button>
-      <button id="download-pdf">Download PDF</button>
+      <!-- Image upload -->
+      <h3>Image (upload)</h3>
+      <input id="image-upload" type="file" accept="image/*" />
+      <button id="remove-image">Remove All Images</button>
+
+      <!-- Selected object controls (icons/images) -->
+      <div id="selected-controls" style="display:none;">
+        <div class="muted">Selected object: <span id="selected-type">—</span></div>
+        <label>Color</label>
+        <input id="selected-color" type="color" value="#00d4ff" />
+        <label>Glow intensity</label>
+        <input id="selected-glow" type="range" min="0" max="80" value="14" />
+        <label id="selected-size-label">Size</label>
+        <input id="selected-size" type="range" min="10" max="800" value="40" />
+        <div class="row" style="margin-top:8px">
+          <button id="bring-front">Bring to Front</button>
+          <button id="send-back">Send to Back</button>
+        </div>
+        <div style="margin-top:8px">
+          <button id="delete-selected" style="background:linear-gradient(90deg,#ff004b,#ff8a00)">Delete Selected</button>
+        </div>
+      </div>
+
+      <!-- Export -->
+      <div style="margin-top:12px">
+        <button id="download-png">Download PNG</button>
+        <button id="download-pdf">Download PDF (letter 8.5x11)</button>
+        <button id="download-html">Export as HTML</button>
+      </div>
+      <div class="sp"></div>
+      <div class="muted">Tip: Click an icon/image on the flyer to select it and open the object controls.</div>
     </div>
 
+    <!-- PREVIEW -->
     <div class="preview">
-      <h2>Flyer Preview</h2>
-      <div class="flyer-preview" id="flyer-preview">
+      <div class="flyer-preview" id="flyer-preview" >
         <h1 class="flyer-header" id="preview-header">NEON NIGHT FESTIVAL</h1>
         <h2 class="flyer-title" id="preview-title">Where the Future Meets the Beat</h2>
         <p class="flyer-content" id="preview-content">Experience music, lights, and energy like never before. Saturday, Downtown Arena. Be there.</p>
-        <div id="image-wrapper" class="resizable-draggable" style="display:none;">
-          <img id="preview-image" src="">
-        </div>
+
+        <!-- container for images/icons placed by user -->
       </div>
     </div>
   </div>
 
   <script>
-    const headerEl = document.getElementById('preview-header');
-    const titleEl = document.getElementById('preview-title');
-    const contentEl = document.getElementById('preview-content');
-
-    // Live typing
-    document.getElementById('header-text').addEventListener('input', e => headerEl.textContent = e.target.value);
-    document.getElementById('title-text').addEventListener('input', e => titleEl.textContent = e.target.value);
-    document.getElementById('content-text').addEventListener('input', e => contentEl.textContent = e.target.value);
-
-    // Font sizes
-    document.getElementById('header-size').addEventListener('input', e => headerEl.style.fontSize = e.target.value + 'px');
-    document.getElementById('title-size').addEventListener('input', e => titleEl.style.fontSize = e.target.value + 'px');
-    document.getElementById('content-size').addEventListener('input', e => contentEl.style.fontSize = e.target.value + 'px');
-
-    // Fonts
-    document.getElementById('font-select').addEventListener('change', e => {
-      const font = e.target.value;
-      headerEl.style.fontFamily = font;
-      titleEl.style.fontFamily = font;
-      contentEl.style.fontFamily = font;
-    });
-
-    // Neon colors
-    const neonColors = ["#00d4ff","#ff00ff","#39ff14","#ffea00","#ff073a","#ff6600","#8a2be2","#00ffcc"];
-    document.querySelectorAll('.color-palette').forEach(palette => {
-      neonColors.forEach(color => {
-        const swatch = document.createElement('div');
-        swatch.className = 'color-swatch';
-        swatch.style.background = color;
-        swatch.addEventListener('click', () => {
-          const target = palette.dataset.target;
-          let el;
-          if (target === 'header') el = headerEl;
-          if (target === 'title') el = titleEl;
-          if (target === 'content') el = contentEl;
-          el.style.color = color;
-          el.style.textShadow = `0 0 12px ${color}`;
-        });
-        palette.appendChild(swatch);
-      });
-    });
-
-    // Image upload
-    document.getElementById('image-upload').addEventListener('change', e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = evt => {
-        document.getElementById('preview-image').src = evt.target.result;
-        document.getElementById('image-wrapper').style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    });
-    document.getElementById('remove-image').addEventListener('click', () => {
-      document.getElementById('preview-image').src = '';
-      document.getElementById('image-wrapper').style.display = 'none';
-    });
-
-    // Dragging image
-    const wrapper = document.getElementById('image-wrapper');
-    let isDragging = false, offsetX, offsetY;
-    wrapper.addEventListener('mousedown', e => {
-      if (e.target.tagName === 'IMG') return;
-      isDragging = true;
-      offsetX = e.offsetX;
-      offsetY = e.offsetY;
-    });
-    document.addEventListener('mousemove', e => {
-      if (!isDragging) return;
+    document.addEventListener('DOMContentLoaded', () => {
+      // Elements
       const flyer = document.getElementById('flyer-preview');
-      const rect = flyer.getBoundingClientRect();
-      wrapper.style.left = (e.clientX - rect.left - offsetX) + 'px';
-      wrapper.style.top = (e.clientY - rect.top - offsetY) + 'px';
-    });
-    document.addEventListener('mouseup', () => isDragging = false);
 
-    // Add icons to flyer
-    document.querySelectorAll('#icon-library i').forEach(icon => {
-      icon.addEventListener('click', () => {
-        const flyer = document.getElementById('flyer-preview');
-        const newIcon = document.createElement('i');
-        newIcon.className = icon.className + ' flyer-icon';
-        newIcon.style.left = '50px';
-        newIcon.style.top = '50px';
-        flyer.appendChild(newIcon);
+      const headerText = document.getElementById('header-text');
+      const titleText = document.getElementById('title-text');
+      const contentText = document.getElementById('content-text');
 
-        // Dragging for icons
-        let dragging = false, ox, oy;
-        newIcon.addEventListener('mousedown', e => {
+      const headerEl = document.getElementById('preview-header');
+      const titleEl = document.getElementById('preview-title');
+      const contentEl = document.getElementById('preview-content');
+
+      const headerSize = document.getElementById('header-size');
+      const titleSize = document.getElementById('title-size');
+      const contentSize = document.getElementById('content-size');
+
+      const headerGlow = document.getElementById('header-glow');
+      const titleGlow = document.getElementById('title-glow');
+      const contentGlow = document.getElementById('content-glow');
+
+      const fontSelect = document.getElementById('font-select');
+
+      const palettes = {
+        header: document.getElementById('palette-header'),
+        title: document.getElementById('palette-title'),
+        content: document.getElementById('palette-content')
+      };
+
+      // Selected item controls
+      const selectedControls = document.getElementById('selected-controls');
+      const selectedTypeText = document.getElementById('selected-type');
+      const selectedColorInput = document.getElementById('selected-color');
+      const selectedGlow = document.getElementById('selected-glow');
+      const selectedSize = document.getElementById('selected-size');
+      const selectedSizeLabel = document.getElementById('selected-size-label');
+      const bringFrontBtn = document.getElementById('bring-front');
+      const sendBackBtn = document.getElementById('send-back');
+      const deleteSelectedBtn = document.getElementById('delete-selected');
+
+      const iconLibrary = document.getElementById('icon-library');
+
+      const imageUpload = document.getElementById('image-upload');
+      const removeImageBtn = document.getElementById('remove-image');
+
+      const downloadPNG = document.getElementById('download-png');
+      const downloadPDF = document.getElementById('download-pdf');
+      const exportHTMLbtn = document.getElementById('download-html');
+
+      // Neon color set
+      const neonColors = ["#00d4ff","#ff00ff","#39ff14","#ffea00","#ff073a","#ff6600","#8a2be2","#00ffcc","#ff66ea","#7cffb2","#ffd166","#ff7b7b"];
+
+      // build palettes
+      Object.keys(palettes).forEach(key => {
+        neonColors.forEach(color => {
+          const sw = document.createElement('div');
+          sw.className = 'color-swatch';
+          sw.style.background = color;
+          sw.title = color;
+          sw.addEventListener('click', () => {
+            applyPaletteColor(key, color);
+          });
+          palettes[key].appendChild(sw);
+        });
+      });
+
+      // apply color to respective element
+      function applyPaletteColor(target, color){
+        if(target==='header') {
+          headerEl.style.color = color;
+          headerEl.style.textShadow = `0 0 ${headerGlow.value}px ${color}`;
+        } else if(target==='title') {
+          titleEl.style.color = color;
+          titleEl.style.textShadow = `0 0 ${titleGlow.value}px ${color}`;
+        } else {
+          contentEl.style.color = color;
+          contentEl.style.textShadow = `0 0 ${contentGlow.value}px ${color}`;
+        }
+      }
+
+      // Live typing
+      headerText.addEventListener('input', ()=> headerEl.textContent = headerText.value );
+      titleText.addEventListener('input', ()=> titleEl.textContent = titleText.value );
+      contentText.addEventListener('input', ()=> contentEl.textContent = contentText.value );
+
+      // font sizes
+      headerSize.addEventListener('input', ()=> headerEl.style.fontSize = headerSize.value + 'px' );
+      titleSize.addEventListener('input', ()=> titleEl.style.fontSize = titleSize.value + 'px' );
+      contentSize.addEventListener('input', ()=> contentEl.style.fontSize = contentSize.value + 'px' );
+
+      // glows for text
+      headerGlow.addEventListener('input', ()=> {
+        const color = rgbToHex(getComputedStyle(headerEl).color) || '#00d4ff';
+        headerEl.style.textShadow = `0 0 ${headerGlow.value}px ${color}`;
+      });
+      titleGlow.addEventListener('input', ()=> {
+        const color = rgbToHex(getComputedStyle(titleEl).color) || '#eee';
+        titleEl.style.textShadow = `0 0 ${titleGlow.value}px ${color}`;
+      });
+      contentGlow.addEventListener('input', ()=> {
+        const color = rgbToHex(getComputedStyle(contentEl).color) || '#ddd';
+        contentEl.style.textShadow = `0 0 ${contentGlow.value}px ${color}`;
+      });
+
+      // font family
+      fontSelect.addEventListener('change', e => {
+        const f = e.target.value;
+        headerEl.style.fontFamily = f;
+        titleEl.style.fontFamily = f;
+        contentEl.style.fontFamily = f;
+      });
+
+      // Utility: convert rgb to hex for sync with color input
+      function rgbToHex(rgb){
+        if(!rgb) return null;
+        const m = rgb.match(/\d+/g);
+        if(!m) return null;
+        return "#" + m.slice(0,3).map(x => parseInt(x).toString(16).padStart(2,'0')).join('');
+      }
+
+      /* =========================
+         ICONS: click to add and then drag/select
+         ========================= */
+      iconLibrary.querySelectorAll('i').forEach(icon => {
+        icon.addEventListener('click', () => {
+          const newIcon = document.createElement('i');
+          newIcon.className = icon.className + ' flyer-icon';
+          newIcon.style.left = '60px';
+          newIcon.style.top = '60px';
+          flyer.appendChild(newIcon);
+          makeSelectable(newIcon);
+        });
+      });
+
+      /* =========================
+         IMAGE UPLOAD: inserts image wrapper
+         ========================= */
+      imageUpload.addEventListener('change', e => {
+        const file = e.target.files && e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'resizable-draggable';
+          wrapper.style.left = '80px';
+          wrapper.style.top = '120px';
+          wrapper.style.width = '320px';
+          wrapper.style.zIndex = getNextZ();
+          const img = document.createElement('img');
+          img.src = ev.target.result;
+          wrapper.appendChild(img);
+          flyer.appendChild(wrapper);
+          makeSelectable(wrapper);
+          // update size slider when user resizes via CSS resize handle
+          wrapper.addEventListener('mouseup', () => {
+            if(selectedEl === wrapper) syncSelectedSizeToUI(wrapper);
+          });
+        };
+        reader.readAsDataURL(file);
+        e.target.value = ''; // reset to allow re-upload same file
+      });
+
+      removeImageBtn.addEventListener('click', () => {
+        // remove all images (resizable-draggable)
+        document.querySelectorAll('.resizable-draggable').forEach(n => n.remove());
+        hideSelectedControls();
+      });
+
+      /* =========================
+         Selection + manipulation
+         ========================= */
+      let selectedEl = null;
+      let zCounter = 20; // for bring to front
+
+      function getNextZ(){ zCounter++; return zCounter; }
+
+      function makeSelectable(el){
+        // pointerdown for dragging handled globally; here just add click to select
+        el.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          selectElement(el);
+        });
+      }
+
+      // clicking outside deselects
+      flyer.addEventListener('click', () => { hideSelectedControls(); selectedEl = null; });
+
+      function selectElement(el){
+        selectedEl = el;
+        selectedControls.style.display = 'block';
+        // type
+        const isIcon = el.classList.contains('flyer-icon');
+        const isImage = el.classList.contains('resizable-draggable');
+        selectedTypeText.textContent = isIcon ? 'Icon' : (isImage ? 'Image' : 'Element');
+
+        // default color
+        if(isIcon){
+          const color = rgbToHex(getComputedStyle(el).color) || '#00d4ff';
+          selectedColorInput.value = color;
+          // glow: parse textShadow
+          const glow = parseGlowValue(getComputedStyle(el).textShadow) || 12;
+          selectedGlow.value = glow;
+          selectedSizeLabel.textContent = 'Size (px)';
+          selectedSize.min = 8; selectedSize.max = 300;
+          selectedSize.value = parseInt(getComputedStyle(el).fontSize) || 40;
+        } else if(isImage){
+          // images: color not applicable but we use color as tint/glow color for drop-shadow
+          const filter = getComputedStyle(el).filter || '';
+          // default color pick
+          selectedColorInput.value = '#00d4ff';
+          const glowVal = extractDropShadowRadius(filter) || 0;
+          selectedGlow.value = glowVal;
+          selectedSizeLabel.textContent = 'Width (px)';
+          selectedSize.min = 50; selectedSize.max = 1200;
+          selectedSize.value = el.offsetWidth || 320;
+        } else {
+          // other element
+          selectedColorInput.value = '#00d4ff';
+          selectedGlow.value = 12;
+          selectedSizeLabel.textContent = 'Size';
+          selectedSize.min = 10; selectedSize.max = 400; selectedSize.value = 40;
+        }
+      }
+
+      function hideSelectedControls(){
+        selectedControls.style.display = 'none';
+      }
+
+      // helper: parse text-shadow like "0px 0px 12px rgb(0,212,255)" -> 12
+      function parseGlowValue(shadow){
+        const m = (shadow || '').match(/(\d+)px\s*(?:,|$)/);
+        if(m) return parseInt(m[1]);
+        return null;
+      }
+      function extractDropShadowRadius(filter){
+        const m = (filter || '').match(/drop-shadow\(.+?(\d+)px/);
+        if(m) return parseInt(m[1]);
+        return null;
+      }
+
+      // Selected controls interactions
+      selectedColorInput.addEventListener('input', () => {
+        if(!selectedEl) return;
+        const color = selectedColorInput.value;
+        if(selectedEl.classList.contains('flyer-icon')){
+          selectedEl.style.color = color;
+          selectedEl.style.textShadow = `0 0 ${selectedGlow.value}px ${color}`;
+        } else if(selectedEl.classList.contains('resizable-draggable')){
+          // apply drop-shadow around image (approx neon glow)
+          selectedEl.style.filter = `drop-shadow(0 0 ${selectedGlow.value}px ${color})`;
+        }
+      });
+
+      selectedGlow.addEventListener('input', () => {
+        if(!selectedEl) return;
+        const g = selectedGlow.value;
+        const color = selectedColorInput.value || '#00d4ff';
+        if(selectedEl.classList.contains('flyer-icon')){
+          selectedEl.style.textShadow = `0 0 ${g}px ${color}`;
+        } else if(selectedEl.classList.contains('resizable-draggable')){
+          selectedEl.style.filter = `drop-shadow(0 0 ${g}px ${color})`;
+        }
+      });
+
+      selectedSize.addEventListener('input', () => {
+        if(!selectedEl) return;
+        const v = selectedSize.value;
+        if(selectedEl.classList.contains('flyer-icon')){
+          selectedEl.style.fontSize = v + 'px';
+        } else if(selectedEl.classList.contains('resizable-draggable')){
+          selectedEl.style.width = v + 'px';
+        }
+      });
+
+      bringFrontBtn.addEventListener('click', () => {
+        if(!selectedEl) return;
+        selectedEl.style.zIndex = getNextZ();
+      });
+      sendBackBtn.addEventListener('click', () => {
+        if(!selectedEl) return;
+        selectedEl.style.zIndex = 1;
+      });
+      deleteSelectedBtn.addEventListener('click', () => {
+        if(!selectedEl) return;
+        selectedEl.remove();
+        selectedEl = null;
+        hideSelectedControls();
+      });
+
+      /* =========================
+         Dragging logic (pointer events)
+         single unified handler for icons and image wrappers
+         ========================= */
+      let dragging = false, dragEl = null, dragOffsetX = 0, dragOffsetY = 0;
+
+      // start dragging when pointer down on icon or wrapper
+      flyer.addEventListener('pointerdown', (e) => {
+        const target = e.target;
+        // find if we clicked on an element we should drag
+        const draggable = target.closest('.flyer-icon, .resizable-draggable');
+        if(draggable && flyer.contains(draggable)){
+          e.preventDefault();
+          dragEl = draggable;
           dragging = true;
-          ox = e.offsetX;
-          oy = e.offsetY;
-        });
-        document.addEventListener('mousemove', e => {
-          if (!dragging) return;
-          const rect = flyer.getBoundingClientRect();
-          newIcon.style.left = (e.clientX - rect.left - ox) + 'px';
-          newIcon.style.top = (e.clientY - rect.top - oy) + 'px';
-        });
-        document.addEventListener('mouseup', () => dragging = false);
+          // compute offset relative to element's top-left
+          const rect = dragEl.getBoundingClientRect();
+          dragOffsetX = e.clientX - rect.left;
+          dragOffsetY = e.clientY - rect.top;
+          // select it
+          selectElement(dragEl);
+        }
       });
-    });
 
-    // Download
-    document.getElementById('download-png').addEventListener('click', () => {
-      html2canvas(document.getElementById('flyer-preview')).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'flyer.png';
-        link.href = canvas.toDataURL();
-        link.click();
+      document.addEventListener('pointermove', (e) => {
+        if(!dragging || !dragEl) return;
+        const flyerRect = flyer.getBoundingClientRect();
+        // compute new position relative to flyer
+        let left = e.clientX - flyerRect.left - dragOffsetX;
+        let top  = e.clientY - flyerRect.top - dragOffsetY;
+        // clamp so element doesn't fully escape (allow partial)
+        if(left < -50) left = -50;
+        if(top  < -50) top = -50;
+        dragEl.style.left = left + 'px';
+        dragEl.style.top  = top + 'px';
+        dragEl.style.position = 'absolute';
       });
-    });
-    document.getElementById('download-pdf').addEventListener('click', () => {
-      html2canvas(document.getElementById('flyer-preview')).then(canvas => {
+
+      document.addEventListener('pointerup', () => {
+        dragging = false; dragEl = null;
+      });
+
+      /* =========================
+         Sync header/title/content color glows initial values
+         ========================= */
+      // initialize applying default palettes
+      applyPaletteColor('header', '#00d4ff');
+      applyPaletteColor('title', '#ff00ff');
+      applyPaletteColor('content', '#39ff14');
+
+      /* =========================
+         Export PNG / PDF / HTML
+         ========================= */
+      downloadPNG.addEventListener('click', async () => {
+        // scale up canvas to improve quality (2x devicePixelRatio)
+        const canvas = await html2canvas(flyer, {scale: Math.max(2, window.devicePixelRatio || 2), useCORS:true, allowTaint:true});
+        const url = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = url; a.download = 'flyer.png'; document.body.appendChild(a); a.click(); a.remove();
+      });
+
+      downloadPDF.addEventListener('click', async () => {
+        // html2canvas -> high-res canvas
+        const canvas = await html2canvas(flyer, {scale: Math.max(2, window.devicePixelRatio || 2), useCORS:true, allowTaint:true});
         const imgData = canvas.toDataURL('image/png');
+        // create pdf with unit: inches, letter size (8.5 x 11)
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('portrait', 'pt', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save('flyer.pdf');
+        const doc = new jsPDF({unit:'in', format:[8.5,11]});
+        // compute image height in inches respecting aspect ratio (canvas.width/canvas.height)
+        const imgWidthIn = 8.5;
+        const imgHeightIn = (canvas.height / canvas.width) * imgWidthIn;
+        doc.addImage(imgData, 'PNG', 0, 0, imgWidthIn, imgHeightIn, undefined, 'FAST');
+        doc.save('flyer_letter.pdf');
       });
-    });
+
+      exportHTMLbtn.addEventListener('click', () => {
+        // Build a standalone HTML file that includes Google Fonts + FontAwesome + styles + flyer markup
+        const fontsLink = `<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">`;
+        const faLink = `<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">`;
+
+        // Minimal CSS for exported flyer (we copy essential rules)
+        const exportCSS = `
+          body{margin:0;padding:0;background:#070710;display:flex;justify-content:center;align-items:flex-start;padding:20px}
+          .flyer{width:8.5in;height:11in;background:linear-gradient(160deg,#0f1224,#12122b);padding:56px 48px;box-sizing:border-box;border-radius:12px;overflow:hidden}
+          .flyer *{box-sizing:border-box}
+          .flyer h1{font-family:Orbitron,Roboto,sans-serif;font-size:${headerEl.style.fontSize || getComputedStyle(headerEl).fontSize};color:${getComputedStyle(headerEl).color};text-shadow:${getComputedStyle(headerEl).textShadow}}
+          .flyer h2{font-size:${titleEl.style.fontSize || getComputedStyle(titleEl).fontSize};font-family:${getComputedStyle(titleEl).fontFamily};color:${getComputedStyle(titleEl).color};text-shadow:${getComputedStyle(titleEl).textShadow}}
+          .flyer p{font-size:${contentEl.style.fontSize || getComputedStyle(contentEl).fontSize};color:${getComputedStyle(contentEl).color};text-shadow:${getComputedStyle(contentEl).textShadow};white-space:pre-wrap}
+          .flyer img{max-width:100%}
+          .flyer .flyer-icon{position:absolute}
+        `;
+
+        // clone the flyer so we can inline styles
+        const clone = flyer.cloneNode(true);
+        // remove UI-only attributes (none major), and ensure absolute positions remain inline style (already are)
+        const htmlContent = clone.outerHTML;
+
+        const docHTML = `<!doctype html><html><head><meta charset="utf-8">${fontsLink}${faLink}<style>${exportCSS}</style></head><body><div class="flyer-container">${htmlContent}</div></body></html>`;
+
+        const blob = new Blob([docHTML], {type:'text/html'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'flyer.html'; document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      /* =========================
+         Keyboard delete support when selected
+         ========================= */
+      document.addEventListener('keydown', e => {
+        if(e.key === 'Delete' && selectedEl){
+          selectedEl.remove();
+          selectedEl = null; hideSelectedControls();
+        }
+      });
+
+      /* =========================
+         Helper: sync selected size UI to wrapper current width
+         ========================= */
+      function syncSelectedSizeToUI(wrapper){
+        if(selectedEl === wrapper){
+          selectedSize.value = wrapper.offsetWidth || parseInt(selectedSize.value);
+        }
+      }
+
+      /* =========================
+         keep all UI responsive on resize
+         ========================= */
+      window.addEventListener('resize', () => {
+        // nothing special yet; but you can hook to re-render or adjust rulers
+      });
+
+    }); // DOMContentLoaded
   </script>
 </body>
 </html>
